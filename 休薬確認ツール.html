@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>術前休薬確認ツール Ver13.0</title>
+    <title>術前休薬確認ツール Ver14.0</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { font-family: "Helvetica Neue", Arial, sans-serif; background-color: #f4f6f9; color: #333; }
@@ -11,7 +11,7 @@
         
         /* --- タブ設定 --- */
         .sticky-tabs {
-            position: -webkit-sticky; position: sticky; top: 0; z-index: 1000;
+            position: -webkit-sticky; position: sticky; top: 0; z-index: 900;
             background-color: #f4f6f9; padding-top: 10px; margin-bottom: 20px; border-bottom: 1px solid #dee2e6;
         }
         .nav-tabs { border-bottom: none; }
@@ -49,7 +49,7 @@
         /* --- 印刷設定 --- */
         @media print {
             body { background: white; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .no-print, .nav-tabs, .btn, .form-control, .alert, .modal-backdrop, #backToTop, .sticky-tabs { display: none !important; }
+            .no-print, .nav-tabs, .btn, .form-control, .alert, .modal-backdrop, #backToTop, .sticky-tabs, #custom-hamburger-menu { display: none !important; }
             .container-main { box-shadow: none; margin: 0; padding: 0; max-width: 100% !important; width: 100% !important; }
             .print-header { display: flex !important; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px; }
             
@@ -150,11 +150,45 @@
 </head>
 <body>
 
+<div id="custom-hamburger-menu" class="no-print">
+    <style>
+        #menu-toggle-btn { position: fixed; top: 15px; right: 20px; z-index: 9999; width: 50px; height: 50px; background-color: #333; border: 2px solid #fff; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); transition: all 0.3s; }
+        #menu-toggle-btn:hover { background-color: #555; transform: scale(1.05); }
+        .bar { width: 28px; height: 3px; background-color: white; border-radius: 2px; }
+        #menu-content { display: none; position: fixed; top: 75px; right: 20px; width: 260px; background-color: #333; border: 1px solid #555; border-radius: 8px; padding: 15px; z-index: 9998; box-shadow: 0 10px 25px rgba(0,0,0,0.5); flex-direction: column; font-family: "Helvetica Neue", Arial, sans-serif; text-align: left; }
+        #menu-content.active { display: flex; animation: fadeIn 0.2s ease-out; }
+        .menu-header { color: #aaa; font-size: 12px; margin-bottom: 10px; text-align: center; border-bottom: 1px solid #555; padding-bottom: 5px; }
+        .menu-link { display: block; color: white !important; text-decoration: none; padding: 12px 15px; margin-bottom: 6px; border-radius: 4px; background-color: #444; font-size: 16px; font-weight: bold; transition: background 0.2s; }
+        .menu-link:hover { background-color: #0d6efd; color: white; }
+        .close-btn { margin-top: 10px; background: transparent; border: 1px solid #777; color: #ccc; padding: 5px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 0.9rem; }
+        .close-btn:hover { background: #555; color: white; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+    <button id="menu-toggle-btn" onclick="toggleMenu()" title="メニューを開く">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <nav id="menu-content">
+        <div class="menu-header">業務支援ツール統合メニュー</div>
+        <a href="index.html" class="menu-link">🏠 メニュー画面へ</a>
+        <hr style="margin: 8px 0; border-color: #555;">
+        <a href="休薬確認ツール.html" class="menu-link">💊 休薬確認ツール</a>
+        <a href="配合変化ツール.html" class="menu-link">⚗️ 配合変化ツール</a>
+        <a href="小児投与量確認ツール.html" class="menu-link">👶 小児用量監査</a>
+        <button onclick="toggleMenu()" class="close-btn">閉じる</button>
+    </nav>
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById('menu-content');
+            menu.classList.toggle('active');
+        }
+    </script>
+</div>
+
 <button id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">▲</button>
 
 <div class="container-main">
     <div class="d-flex justify-content-between align-items-center no-print mb-3">
-        <h3 class="text-dark fw-bold m-0">🏥 術前休薬確認ツール Ver13.0</h3>
+        <h3 class="text-dark fw-bold m-0">🏥 術前休薬確認ツール Ver14.0</h3>
         <button class="btn btn-secondary btn-sm" onclick="window.location.reload()">リセット</button>
     </div>
 
@@ -369,7 +403,7 @@
 
 <script>
 // ==========================================
-// 1. データ定義 (VBAでこの変数が置換されます)
+// 1. データ定義
 // ==========================================
 const citations = {
     "1": "糖尿病治療におけるSGLT2阻害薬の適正使用に関する Recommendation",
@@ -763,13 +797,11 @@ function parseMasterData(rawData) {
         const line = lines[i].trim();
         if(!line) continue;
         
-        // ヘッダー行検出: "分類" から始まる行をヘッダーとみなし、スキップする
+        // ヘッダー行検出
         if (line.startsWith("分類")) {
             isHeaderFound = true;
             continue; 
         }
-        
-        // ヘッダーが見つかるまでは読み飛ばす
         if (!isHeaderFound) continue;
         
         const cols = line.split("\t");
@@ -799,20 +831,11 @@ function cleanDrugName(rawText) {
     if (!rawText || rawText.trim() === "") return null;
     let fullDrugName = rawText.trim();
     
-    // 【修正】 NGワードチェックは processData のループ内（Normalモード時のみ）で行うため
-    // ここでは純粋な文字列整形のみを行う
-    
+    // 文字列整形
     fullDrugName = fullDrugName.replace(/（[^）]+）/g, "").replace(/^[\s　]+/, "");
-    
-    // スペースや「 で区切る (VBAロジック準拠)
     const splitMatch = fullDrugName.match(/^([^\s　「]+)/);
-    if(splitMatch) {
-        fullDrugName = splitMatch[1];
-    }
-    
-    fullDrugName = fullDrugName.replace("★", "");
-    
-    // 全角変換
+    if(splitMatch) { fullDrugName = splitMatch[1]; }
+    fullDrugName = fullDrugName.replace("★", "").replace("（医療用）", "");
     fullDrugName = fullDrugName.replace(/[A-Za-z0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
 
     let processedName = fullDrugName;
@@ -839,7 +862,7 @@ function cleanDrugName(rawText) {
 }
 
 // ==========================================
-// 3. 判定ロジック (Strict Rpモード対応)
+// 3. 判定ロジック (3モード切替)
 // ==========================================
 function processData() {
     const rawInput = document.getElementById("rawInput").value;
@@ -858,99 +881,118 @@ function processData() {
     // 行分割
     const lines = rawInput.split("\n");
     
-    // Strictモード判定: 入力全体に「Rp」が含まれているか？
-    const useStrictRpMode = lines.some(line => line.match(/Rp|Ｒｐ|RP|rp/i));
+    // 全体スキャンによるモード判定
+    let hasRp = false;
+    let hasIndent = false;
     
+    for (const line of lines) {
+        if (/Rp|Ｒｐ|RP|rp/i.test(line)) {
+            hasRp = true;
+            break; // Rpが見つかれば最強のStrict Rpモード確定
+        }
+        // インデント判定 (全角スペース考慮)
+        const checkStr = line.replace(/　/g, " ");
+        const blankCount = checkStr.length - checkStr.trimStart().length;
+        if (blankCount >= 2 && line.trim() !== "") {
+            hasIndent = true;
+        }
+    }
+    
+    // モード決定
+    let mode = "Simple";
+    if (hasRp) {
+        mode = "StrictRp";
+    } else if (hasIndent) {
+        mode = "Indent";
+    }
+    // console.log("Mode:", mode);
+
     let isPrevRp = false;
     let hasData = false;
 
     lines.forEach(line => {
-        // 空行は処理対象外かつRpチェーンを断ち切る
         const trimmedLine = line.trim();
-        let isCurrentRp = false;
-
-        if (trimmedLine !== "") {
-            // 現在行がRpかどうか判定
-            isCurrentRp = /Rp|Ｒｐ|RP|rp/i.test(line);
+        let shouldKeep = false;
+        
+        if (mode === "StrictRp") {
+            const isCurrentRp = /Rp|Ｒｐ|RP|rp/i.test(line);
+            if (isPrevRp && !isCurrentRp) {
+                shouldKeep = true;
+            }
+            isPrevRp = isCurrentRp; // 次の行のために更新
             
-            let shouldKeep = false;
+        } else if (mode === "Indent") {
+            // インデントがあり、かつNGワードがない行を採用
+            const checkStr = line.replace(/　/g, " ");
+            const blankCount = checkStr.length - checkStr.trimStart().length;
+            const isNG = ngKeywords.some(ng => line.includes(ng));
             
-            if (useStrictRpMode) {
-                // Strictモード: 直前の行がRpで、かつ今の行がRpでない場合のみ採用
-                // NGワードチェックは行わない（"1日1回"なども採用するため）
-                if (isPrevRp && !isCurrentRp) {
-                    shouldKeep = true;
-                }
-            } else {
-                // 通常モード: インデントが全角換算で2文字分以上あるか判定
-                const checkStr = line.replace(/　/g, " ");
-                const blankCount = checkStr.length - checkStr.trimStart().length;
-                
-                // NGワードが含まれていないことも条件
-                const isNG = ngKeywords.some(ng => line.includes(ng));
-                
-                if (blankCount >= 2 && !isNG) {
-                    shouldKeep = true;
-                }
+            if (blankCount >= 2 && !isNG && trimmedLine !== "") {
+                shouldKeep = true;
             }
             
-            if (shouldKeep) {
-                const cleanedName = cleanDrugName(line);
-                if (cleanedName) {
-                    hasData = true;
-                    const match = masterData.find(d => d.brandName.startsWith(cleanedName) || d.genericName === cleanedName);
-                    const tr = document.createElement("tr");
-
-                    if (match) {
-                        let rowClass = "";
-                        let calcText = "-";
-                        
-                        if (match.period.includes("院内推奨期間なし")) {
-                             rowClass = "row-gray";
-                             calcText = "院内推奨期間なし";
-                        } else {
-                            const testCalc = calculateStopDateStrict(match.period, "2025-01-01");
-                            if (testCalc.alert || match.period.includes("資料")) {
-                                rowClass = "row-alert";
-                            } else {
-                                rowClass = "row-none";
-                            }
-                        }
-
-                        if (hasDate && !match.period.includes("院内推奨期間なし")) {
-                            const calc = calculateStopDateStrict(match.period, surgeryDateStr);
-                            calcText = calc.text;
-                        } else if (!hasDate && rowClass === "row-alert") {
-                            calcText = match.period;
-                        }
-
-                        tr.className = rowClass;
-                        tr.innerHTML = `
-                            <td class="fw-bold">${cleanedName}</td>
-                            <td class="small">${match.type}</td>
-                            <td class="small">${match.period}</td>
-                            <td class="fw-bold" style="${hasDate?'':'display:none;'}">${calcText}</td>
-                            <td class="small">${match.reason}</td>
-                            <td class="small text-center">${match.ref}</td>
-                        `;
-                    } else {
-                        tr.className = "row-none";
-                        tr.innerHTML = `
-                            <td>${cleanedName}</td>
-                            <td class="small text-muted">-</td>
-                            <td class="small text-muted">指定なし</td>
-                            <td class="small text-muted" style="${hasDate?'':'display:none;'}">-</td>
-                            <td class="small text-muted">指定なし</td>
-                            <td class="small text-muted">-</td>
-                        `;
-                    }
-                    resultTableBody.appendChild(tr);
-                }
+        } else {
+            // Simple Mode: 空行でなく、NGワードが含まれない行を全て採用
+            // (薬剤名リストの貼り付けを想定)
+            const isNG = ngKeywords.some(ng => line.includes(ng));
+            if (trimmedLine !== "" && !isNG) {
+                shouldKeep = true;
             }
         }
         
-        // 次のループのために状態更新
-        isPrevRp = isCurrentRp;
+        if (shouldKeep) {
+            const cleanedName = cleanDrugName(line);
+            if (cleanedName) {
+                hasData = true;
+                const match = masterData.find(d => d.brandName.startsWith(cleanedName) || d.genericName === cleanedName);
+                const tr = document.createElement("tr");
+
+                if (match) {
+                    let rowClass = "";
+                    let calcText = "-";
+                    
+                    if (match.period.includes("院内推奨期間なし")) {
+                         rowClass = "row-gray";
+                         calcText = "院内推奨期間なし";
+                    } else {
+                        const testCalc = calculateStopDateStrict(match.period, "2025-01-01");
+                        if (testCalc.alert || match.period.includes("資料")) {
+                            rowClass = "row-alert";
+                        } else {
+                            rowClass = "row-none";
+                        }
+                    }
+
+                    if (hasDate && !match.period.includes("院内推奨期間なし")) {
+                        const calc = calculateStopDateStrict(match.period, surgeryDateStr);
+                        calcText = calc.text;
+                    } else if (!hasDate && rowClass === "row-alert") {
+                        calcText = match.period;
+                    }
+
+                    tr.className = rowClass;
+                    tr.innerHTML = `
+                        <td class="fw-bold">${cleanedName}</td>
+                        <td class="small">${match.type}</td>
+                        <td class="small">${match.period}</td>
+                        <td class="fw-bold" style="${hasDate?'':'display:none;'}">${calcText}</td>
+                        <td class="small">${match.reason}</td>
+                        <td class="small text-center">${match.ref}</td>
+                    `;
+                } else {
+                    tr.className = "row-none";
+                    tr.innerHTML = `
+                        <td>${cleanedName}</td>
+                        <td class="small text-muted">-</td>
+                        <td class="small text-muted">指定なし</td>
+                        <td class="small text-muted" style="${hasDate?'':'display:none;'}">-</td>
+                        <td class="small text-muted">指定なし</td>
+                        <td class="small text-muted">-</td>
+                    `;
+                }
+                resultTableBody.appendChild(tr);
+            }
+        }
     });
 
     if (!hasData) resultTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">有効なデータなし</td></tr>';
