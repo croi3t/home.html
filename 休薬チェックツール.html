@@ -287,18 +287,7 @@
 })();
 </script>
 
-<div id="custom-hamburger-menu" class="no-print">
-    <button id="menu-toggle-btn" onclick="toggleMenu()" title="メニューを開く"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-    <nav id="menu-content">
-        <div style="color:#aaa; font-size:12px; margin-bottom:10px; text-align:center; border-bottom:1px solid #555; padding-bottom:5px;">業務支援ツール統合メニュー</div>
-        <a href="index.html" class="menu-link">🏠 メニュー画面へ</a>
-        <hr style="margin: 8px 0; border-color: #555;">
-        <a href="休薬確認ツール.html" class="menu-link">💊 休薬確認ツール</a>
-        <a href="配合変化ツール.html" class="menu-link">💉 配合変化ツール</a>
-        <a href="小児投与量確認ツール.html" class="menu-link">👶 小児用量監査</a>
-        <button onclick="toggleMenu()" style="width:100%; margin-top:10px; background:transparent; border:1px solid #777; color:#ccc; padding:5px; border-radius:4px; cursor:pointer;">閉じる</button>
-    </nav>
-</div>
+
 <button id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'});">▲</button>
 
 <div class="container-main">
@@ -511,7 +500,7 @@
 
 <script>
 // --- VBAで書き換える変数 ---
-const DATA_UPDATED = "2026.02.11";
+const DATA_UPDATED = "2026.02.10";
 
 // VBA置換用マーカー (マスタデータは変更なしのため省略、実際のコードには含めてください)
 const rawMasterData = `
@@ -794,7 +783,7 @@ const rawMasterData = `
 抗悪性腫瘍薬	抗VEGF抗体	アバスチン	ベバシズマブ	4～6週間	5	創傷治癒遅延
 血液凝固阻止剤	血液凝固系阻害	ヘパリンＣａ	ヘパリンカルシウム	院内推奨期間なし	3	出血リスク
 血液凝固阻止剤	血液凝固系阻害	ヘパリンＮａ	ヘパリンナトリウム	院内推奨期間なし	3	出血リスク
-血液凝固阻止剤	血液凝固系阻害	ノボ・ヘパリン	ヘパリン	院内推奨期間なし	3	出血リスク
+血液凝固阻止剤	血液凝固系阻害	ノボ・ヘパリン	ヘパリンナトリウム	院内推奨期間なし	3	出血リスク
 血液凝固阻止剤	血液凝固系阻害	ヘパリン類似物質	ヘパリン類似物質	-	-	外用剤のため全身への影響は少ない
 降圧薬	β受容体遮断薬	カルバン	ベバントロール	継続を推奨	3	中止により反跳性高血圧､虚血症状､不整脈のリスク
 抗血小板薬	抗血小板薬	ケアロード	ベラプロスト	1日前	3	出血リスク
